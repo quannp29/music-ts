@@ -3,8 +3,10 @@ import Song from "../../models/song.model";
 import Singer from "../../models/singer.model";
 import unidecode from "unidecode";
 
-// [GET] /search/result
+// [GET] /search/:type
 export const result = async (req: Request, res: Response) => {
+  const type: string = `${req.params.type}`
+
   const keyword: string = `${req.query.keyword}`;
 
   // Loại bỏ dấu
@@ -18,9 +20,9 @@ export const result = async (req: Request, res: Response) => {
 
   const keywordRegex = new RegExp(keyword, "i");
 
-  let songs = [];
+  let songsDetail = [];
   if (keyword) {
-    songs = await Song.find({
+    const songs = await Song.find({
       $or: [{ slug: keywordSlugRegex }, { title: keywordRegex }],
       deleted: false,
       status: "active",
@@ -32,13 +34,29 @@ export const result = async (req: Request, res: Response) => {
         deleted: false,
       }).select("fullName");
 
-      item["singer"] = singer;
+      songsDetail.push({
+        id: item.id,
+        avatar: item.avatar,
+        title: item.title,
+        like: item.like,
+        slug: item.slug,
+        singer: {
+          fullName: singer.fullName
+        },
+      });
     }
   }
 
-  res.render("client/pages/search/result", {
-    pageTitle: `Kết quả: ${keyword}`,
-    keyword: keyword,
-    songs: songs,
-  });
+  if(type == "result") {
+    res.render("client/pages/search/result", {
+      pageTitle: `Kết quả: ${keyword}`,
+      keyword: keyword,
+      songs: songsDetail
+    });
+  } else {
+    res.json({
+      code: 200,
+      songs: songsDetail
+    });
+  }
 };

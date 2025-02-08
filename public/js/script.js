@@ -1,6 +1,6 @@
 // APlayer
 const aplayer = document.querySelector("#aplayer");
-if(aplayer) {
+if (aplayer) {
   let dataSong = aplayer.getAttribute("data-song");
   dataSong = JSON.parse(dataSong);
 
@@ -9,67 +9,73 @@ if(aplayer) {
 
   const ap = new APlayer({
     container: aplayer,
-    audio: [{
+    audio: [
+      {
         name: dataSong.title,
         artist: dataSinger.fullName,
         url: dataSong.audio,
-        cover: dataSong.avatar
-    }],
-    autoplay: true
+        cover: dataSong.avatar,
+      },
+    ],
+    autoplay: true,
   });
 
   const avatar = document.querySelector(".singer-detail .inner-avatar");
 
-  ap.on("play", function(){
+  ap.on("play", function () {
     avatar.style.animationPlayState = "running";
   });
 
-  ap.on("pause", function(){
+  ap.on("pause", function () {
     avatar.style.animationPlayState = "paused";
-  })
+  });
 }
 // End APlayer
 
 // Button Like
 const buttonLike = document.querySelector("[button-like]");
-if(buttonLike) {
+if (buttonLike) {
   buttonLike.addEventListener("click", () => {
     const id = buttonLike.getAttribute("button-like");
 
     const status = buttonLike.classList.contains("active") ? "dislike" : "like";
 
     fetch(`/songs/like/${status}/${id}`, {
-      method: "PATCH"
+      method: "PATCH",
     })
-      .then(res => res.json())
-      .then(data => {
-        if(data.code == 200) {
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.code == 200) {
           const elementNumber = buttonLike.querySelector(".inner-number");
           elementNumber.innerHTML = data.like;
           buttonLike.classList.toggle("active");
         }
-      })
-  })
+      });
+  });
 }
 // End Button Like
 
 // Button Favorite
-const buttonFavorite = document.querySelector("[button-favorite]");
-if(buttonFavorite) {
-  buttonFavorite.addEventListener("click", () => {
-    const id = buttonFavorite.getAttribute("button-favorite");
+const listButtonFavorite = document.querySelectorAll("[button-favorite]");
+if (listButtonFavorite.length > 0) {
+  listButtonFavorite.forEach((buttonFavorite) => {
+    buttonFavorite.addEventListener("click", () => {
+      const id = buttonFavorite.getAttribute("button-favorite");
 
-    const status = buttonFavorite.classList.contains("active") ? "unfavorite" : "favorite";
+      const status = buttonFavorite.classList.contains("active")
+        ? "unfavorite"
+        : "favorite";
 
-    fetch(`/songs/favorite/${status}/${id}`, {
-      method: "PATCH"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if(data.code == 200) {
-          buttonFavorite.classList.toggle("active");
-        }
+      fetch(`/songs/favorite/${status}/${id}`, {
+        method: "PATCH",
       })
-  })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.code == 200) {
+            buttonFavorite.classList.toggle("active");
+          }
+        });
+    });
+  });
 }
 // End Button Favorite

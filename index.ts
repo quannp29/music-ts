@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import env from "dotenv";
 env.config();
 
+import bodyParser from "body-parser";
 import { connect } from "./config/database";
 import clientRoutes from "./routes/client/index.route";
 import path from "path";
@@ -16,6 +17,9 @@ app.set("views", "./views");
 app.set("view engine", "pug");
 
 app.use(express.static("public"));
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // TinyMCE
 app.use(
